@@ -14,7 +14,7 @@ const Stars = (props) => {
   )
 }
 
-const Numbers = ({selectedNumbers}) => {
+const Numbers = ({selectedNumbers, selectNumber}) => {
   const numberClassName = (num) => {
     if (selectedNumbers.indexOf(num) >= 0) {
       return 'selected';
@@ -24,7 +24,7 @@ const Numbers = ({selectedNumbers}) => {
   return (
     <div className="row">
       <div>
-        { Numbers.list.map((num, i) => <span key={i} className={numberClassName(num)}>{num}</span>) }
+        {Numbers.list.map((num, i) => <span key={i} onClick={() => selectNumber(num)} className={numberClassName(num)}>{num}</span>)}
       </div>
     </div>
   )
@@ -50,11 +50,12 @@ const Button = (props) => {
 
 class Game extends Component {
   state = {
-    selectedNumbers: [4, 2],
+    selectedNumbers: [],
   }
 
   selectNumber = (clickedNumber) => {
-    this.setState( prevState => { selectedNumbers: prevState.selectedNumbers.concat(clickedNumber); })
+    const selectedNumbers = [...this.state.selectedNumbers, clickedNumber]
+    this.setState({ selectedNumbers })
   }
 
   render() {
@@ -62,7 +63,7 @@ class Game extends Component {
       <div className="container">
         <h3>Play 9 game</h3>
         <Stars />
-        <Numbers selectedNumbers={this.state.selectedNumbers}/>
+        <Numbers selectedNumbers={this.state.selectedNumbers} selectNumber={this.selectNumber}/>
         <Answer selectedNumbers={this.state.selectedNumbers}/>
         <Button />
       </div>

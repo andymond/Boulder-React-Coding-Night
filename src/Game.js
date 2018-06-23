@@ -32,10 +32,10 @@ const Numbers = ({selectedNumbers, selectNumber}) => {
 
 Numbers.list = _.range(1, 10)
 
-const Answer = ({ selectedNumbers }) => {
+const Answer = ({ selectedNumbers, unselectNumber }) => {
   return (
     <div className="row">
-      {selectedNumbers.map((num, i) => <span key={i}>{num}</span>) }
+      {selectedNumbers.map((num, i) => <span onClick={() => unselectNumber(num)} key={i}>{num}</span>) }
     </div>
   )
 }
@@ -60,13 +60,20 @@ class Game extends Component {
     this.setState({ selectedNumbers })
   }
 
+  unselectNumber = (clickedNumber) => {
+    const selectedNumbers = this.state.selectedNumbers.filter((num) => {
+      num !== clickedNumber
+    })
+    this.setState({ selectedNumbers })
+  }
+
   render() {
     return (
       <div className="container">
         <h3>Play 9 game</h3>
         <Stars numberOfStars={this.state.numberOfStars}/>
         <Numbers selectedNumbers={this.state.selectedNumbers} selectNumber={this.selectNumber}/>
-        <Answer selectedNumbers={this.state.selectedNumbers}/>
+        <Answer selectedNumbers={this.state.selectedNumbers} unselectNumber={this.unselectNumber}/>
         <Button />
       </div>
     )

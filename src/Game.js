@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import _ from 'lodash';
 
-const Stars = (props) => {
-  const numberOfStars = 1 + Math.floor(Math.random() * 9);
+const Stars = ({numberOfStars}) => {
+  console.log(numberOfStars)
   let starArr = [];
   for (let i=0; i < numberOfStars; i++) {
     starArr.push(<i key={i} className="fa fa-star"></i>);
@@ -51,9 +51,11 @@ const Button = (props) => {
 class Game extends Component {
   state = {
     selectedNumbers: [],
+    numberOfStars: 1 + Math.floor(Math.random() * 9)
   }
 
   selectNumber = (clickedNumber) => {
+    if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) { return; }
     const selectedNumbers = [...this.state.selectedNumbers, clickedNumber]
     this.setState({ selectedNumbers })
   }
@@ -62,7 +64,7 @@ class Game extends Component {
     return (
       <div className="container">
         <h3>Play 9 game</h3>
-        <Stars />
+        <Stars numberOfStars={this.state.numberOfStars}/>
         <Numbers selectedNumbers={this.state.selectedNumbers} selectNumber={this.selectNumber}/>
         <Answer selectedNumbers={this.state.selectedNumbers}/>
         <Button />

@@ -40,10 +40,21 @@ const Answer = ({ selectedNumbers, unselectNumber }) => {
   )
 }
 
-const Button = ({ selectedNumbers }) => {
+const Button = ({ selectedNumbers, checkAnswer, answerIsCorrect }) => {
+  let button
+  switch (answerIsCorrect) {
+    case true:
+      button = <button><i className="fa fa-check"></i></button>
+      break;
+    case false:
+      button = <button><i className="fa fa-times"></i></button>
+      break;
+    default:
+      button = <button onClick={checkAnswer} disabled={selectedNumbers.length > 0 ? false : true}>=</button>
+  }
   return (
     <div className="buttons">
-      <button disabled={selectedNumbers.length > 0 ? false : true}>=</button>
+      {button}
     </div>
   )
 }
@@ -51,13 +62,14 @@ const Button = ({ selectedNumbers }) => {
 class Game extends Component {
   state = {
     selectedNumbers: [],
-    numberOfStars: 1 + Math.floor(Math.random() * 9)
+    numberOfStars: 1 + Math.floor(Math.random() * 9),
+    answerIsCorrect: null,
   }
 
   selectNumber = (clickedNumber) => {
     if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) { return; }
     const selectedNumbers = [...this.state.selectedNumbers, clickedNumber]
-    this.setState({ selectedNumbers })
+    this.setState({ selectedNumbers, answerIsCorrect: null })
   }
 
   unselectNumber = (clickedNumber) => {
@@ -67,14 +79,37 @@ class Game extends Component {
     this.setState({ selectedNumbers })
   }
 
+  checkAnswer = () => {
+    this.setState((prevState) => {
+      let sum = prevState.selectedNumbers.reduce((memo, num) => {
+        memo + num, 0
+      })
+      return (
+        {answerIsCorrect: prevState.numberOfStars === sum}
+      )
+    })
+  }
+
   render() {
     return (
       <div className="container">
         <h3>Play 9 game</h3>
-        <Stars numberOfStars={this.state.numberOfStars}/>
-        <Numbers selectedNumbers={this.state.selectedNumbers} selectNumber={this.selectNumber}/>
-        <Answer selectedNumbers={this.state.selectedNumbers} unselectNumber={this.unselectNumber}/>
-        <Button selectedNumbers={this.state.selectedNumbers}/>
+        <Stars
+          numberOfStars={this.state.numberOfStars}
+        />
+        <Numbers
+          selectedNumbers={this.state.selectedNumbers}
+          selectNumber={this.selectNumber}
+        />
+        <Answer
+          selectedNumbers={this.state.selectedNumbers}
+          unselectNumber={this.unselectNumber}
+        />
+        <Button
+          selectedNumbers={this.state.selectedNumbers}
+          checkAnswer={this.checkAnswer}
+          answerIsCorrect={this.state.answerIsCorrect}
+        />
       </div>
     )
   }

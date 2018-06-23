@@ -40,10 +40,10 @@ const Answer = ({ selectedNumbers, unselectNumber }) => {
   )
 }
 
-const Button = (props) => {
+const Button = ({ selectedNumbers }) => {
   return (
     <div className="buttons">
-      <button>=</button>
+      <button disabled={selectedNumbers.length > 0 ? false : true}>=</button>
     </div>
   )
 }
@@ -74,7 +74,7 @@ class Game extends Component {
         <Stars numberOfStars={this.state.numberOfStars}/>
         <Numbers selectedNumbers={this.state.selectedNumbers} selectNumber={this.selectNumber}/>
         <Answer selectedNumbers={this.state.selectedNumbers} unselectNumber={this.unselectNumber}/>
-        <Button />
+        <Button selectedNumbers={this.state.selectedNumbers}/>
       </div>
     )
   }

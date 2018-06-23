@@ -14,8 +14,11 @@ const Stars = ({numberOfStars}) => {
   )
 }
 
-const Numbers = ({selectedNumbers, selectNumber}) => {
+const Numbers = ({selectedNumbers, selectNumber, usedNumbers}) => {
   const numberClassName = (num) => {
+    if (usedNumbers.indexOf(num) >= 0) {
+      return 'used';
+    }
     if (selectedNumbers.indexOf(num) >= 0) {
       return 'selected';
     }
@@ -40,11 +43,11 @@ const Answer = ({ selectedNumbers, unselectNumber }) => {
   )
 }
 
-const Button = ({ selectedNumbers, checkAnswer, answerIsCorrect }) => {
+const Button = ({ selectedNumbers, checkAnswer, answerIsCorrect, acceptAnswer, redraw }) => {
   let button
   switch (answerIsCorrect) {
     case true:
-      button = <button><i className="fa fa-check"></i></button>
+      button = <button><i onClick={acceptAnswer} className="fa fa-check"></i></button>
       break;
     case false:
       button = <button><i className="fa fa-times"></i></button>
@@ -55,6 +58,7 @@ const Button = ({ selectedNumbers, checkAnswer, answerIsCorrect }) => {
   return (
     <div className="buttons">
       {button}
+      <button onClick={redraw}><i className="fa fa-refresh"></i></button>
     </div>
   )
 }
@@ -64,17 +68,23 @@ class Game extends Component {
     selectedNumbers: [],
     numberOfStars: 1 + Math.floor(Math.random() * 9),
     answerIsCorrect: null,
+    usedNumbers: [],
+  }
+
+  redraw = () => {
+    this.setState({ numberOfStars: 1 + Math.floor(Math.random() * 9)})
   }
 
   selectNumber = (clickedNumber) => {
     if (this.state.selectedNumbers.indexOf(clickedNumber) >= 0) { return; }
+    if (this.state.usedNumbers.indexOf(clickedNumber) >= 0) { return; }
     const selectedNumbers = [...this.state.selectedNumbers, clickedNumber]
     this.setState({ selectedNumbers, answerIsCorrect: null })
   }
 
   unselectNumber = (clickedNumber) => {
     const selectedNumbers = this.state.selectedNumbers.filter((num) => {
-      num !== clickedNumber
+      return num !== clickedNumber
     })
     this.setState({ selectedNumbers })
   }
@@ -82,10 +92,24 @@ class Game extends Component {
   checkAnswer = () => {
     this.setState((prevState) => {
       let sum = prevState.selectedNumbers.reduce((memo, num) => {
-        memo + num, 0
-      })
+        return memo + num
+      }, 0)
       return (
         {answerIsCorrect: prevState.numberOfStars === sum}
+      )
+    })
+  }
+
+  acceptAnswer = () => {
+    this.setState((prevState) => {
+      let nums = prevState.usedNumbers.concat(prevState.selectedNumbers)
+      return (
+        {
+          usedNumbers: nums,
+          answerIsCorrect: null,
+          selectedNumbers: [],
+          numberOfStars: 1 + Math.floor(Math.random() * 9)
+        }
       )
     })
   }
@@ -100,6 +124,7 @@ class Game extends Component {
         <Numbers
           selectedNumbers={this.state.selectedNumbers}
           selectNumber={this.selectNumber}
+          usedNumbers={this.state.usedNumbers}
         />
         <Answer
           selectedNumbers={this.state.selectedNumbers}
@@ -109,6 +134,8 @@ class Game extends Component {
           selectedNumbers={this.state.selectedNumbers}
           checkAnswer={this.checkAnswer}
           answerIsCorrect={this.state.answerIsCorrect}
+          acceptAnswer={this.acceptAnswer}
+          redraw={this.redraw}
         />
       </div>
     )

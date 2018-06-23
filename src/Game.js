@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import _ from 'lodash';
 
 const Stars = ({numberOfStars}) => {
-  console.log(numberOfStars)
   let starArr = [];
   for (let i=0; i < numberOfStars; i++) {
     starArr.push(<i key={i} className="fa fa-star"></i>);
@@ -43,22 +42,28 @@ const Answer = ({ selectedNumbers, unselectNumber }) => {
   )
 }
 
-const Button = ({ selectedNumbers, checkAnswer, answerIsCorrect, acceptAnswer, redraw }) => {
-  let button
+const Button = ({ selectedNumbers, checkAnswer, answerIsCorrect, acceptAnswer, redraw, redrawsRemaining }) => {
+  let check
   switch (answerIsCorrect) {
     case true:
-      button = <button><i onClick={acceptAnswer} className="fa fa-check"></i></button>
+      check = <button><i onClick={acceptAnswer} className="fa fa-check"></i></button>
       break;
     case false:
-      button = <button><i className="fa fa-times"></i></button>
+      check = <button><i className="fa fa-times"></i></button>
       break;
     default:
-      button = <button onClick={checkAnswer} disabled={selectedNumbers.length > 0 ? false : true}>=</button>
+      check = <button onClick={checkAnswer} disabled={selectedNumbers.length > 0 ? false : true}>=</button>
+  }
+  let refresh
+  if (redrawsRemaining === 0) {
+    refresh = <button disabled={true} onClick={redraw}><i className="fa fa-refresh"></i></button>
+  } else {
+    refresh = <button onClick={redraw}><i className="fa fa-refresh"></i></button>
   }
   return (
     <div className="buttons">
-      {button}
-      <button onClick={redraw}><i className="fa fa-refresh"></i></button>
+      {check}
+      {refresh}
     </div>
   )
 }
@@ -69,10 +74,18 @@ class Game extends Component {
     numberOfStars: 1 + Math.floor(Math.random() * 9),
     answerIsCorrect: null,
     usedNumbers: [],
+    redrawsRemaining: 5
   }
 
   redraw = () => {
-    this.setState({ numberOfStars: 1 + Math.floor(Math.random() * 9)})
+    if (this.state.redrawsRemaining === 0) { return; }
+    let redraws = this.state.redrawsRemaining - 1
+    this.setState({
+      numberOfStars: 1 + Math.floor(Math.random() * 9),
+      answerIsCorrect: null,
+      selectedNumbers: [],
+      redrawsRemaining: redraws
+    })
   }
 
   selectNumber = (clickedNumber) => {
@@ -136,6 +149,7 @@ class Game extends Component {
           answerIsCorrect={this.state.answerIsCorrect}
           acceptAnswer={this.acceptAnswer}
           redraw={this.redraw}
+          redrawsRemaining={this.state.redrawsRemaining}
         />
       </div>
     )
